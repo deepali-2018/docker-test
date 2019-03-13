@@ -1,0 +1,35 @@
+server {
+  listen       8080;
+  server_name  0.0.0.0;
+
+    #auth_basic                "Restricted Content";
+    #auth_basic_user_file      "/var/www/.htpasswd";
+    root /test-app;
+    index  index.php;
+
+  access_log            /var/log/nginx/docker-test.scicrunch.org.access.log combined;
+  error_log             /var/log/nginx/docker-test.scicrunch.org.error.log;
+
+
+  #location ~ \/(forms|php|swagger-docs|validation|uptime)\/.*\.php$ {
+  location ~ \.php$ {
+    try_files $uri = 404;
+    fastcgi_pass  php-fpm:9000;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param PHP_VALUE "error_log=/var/log/nginx/application_php_errors.log";
+    error_page 503 /503-ratelimit.html;
+
+    fastcgi_connect_timeout 3m;
+    fastcgi_read_timeout 3m;
+    fastcgi_send_timeout 3m;
+    include       fastcgi_params;
+  }
+
+  #location /php/ {
+
+   # alias /test-app/php/;
+    #alias /application/test2.scicrunch.org/php/;
+  #}
+}
+
